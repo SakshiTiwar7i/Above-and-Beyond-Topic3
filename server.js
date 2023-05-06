@@ -1,35 +1,27 @@
 const express = require('express');
-const path = require('path');
-const bodyparser = require("body-parser");
-const session = require("express-session");
-const { v4: uuidv4 } = require("uuid");
-
-const router = require('./router');
-
 const app = express();
 
-const port = process.env.PORT || 3000;
+const port = 3000;
+const base = `${__dirname}/public`;
 
-app.use(bodyparser.json());
-app.use(bodyparser.urlencoded({ extended: true }))
+app.use(express.static('public'));
 
-app.set('view engine', 'ejs');
+app.get('/', function (req, res) {
+    res.sendFile(`${base}/device-list.html`);
+  });
+app.listen(port, () => {
+  console.log(`listening on port ${port}`);
+});
 
-// load static assets
-app.use('/static', express.static(path.join(__dirname, 'public')))
-app.use('/assets', express.static(path.join(__dirname, 'public/assets')))
 
-app.use(session({
-    secret: uuidv4(), //  '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'
-    resave: false,
-    saveUninitialized: true
-}));
+app.get('/register-device', (req, res) => {
+    res.sendFile(`${base}/register-device.html`);
+  });
+  
+app.get('/iot-applications', (req, res) => {
+    res.sendFile(`${base}/iot-applications.html`);
+  });
 
-app.use('/route', router);
-
-// home route
-app.get('/', (req, res) =>{
-    res.render('base', { title : "Login System"});
-})
-
-app.listen(port, ()=>{ console.log("Lostening to the server on http://localhost:3000")});
+app.get('*', (req, res) => {
+    res.sendFile(`${base}/404.html`);
+  });
